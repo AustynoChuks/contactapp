@@ -21,7 +21,7 @@ const ContactList = ({navigation, ...props})=>{
     const fetchContacts = ()=>{
         try{
             Contacts.getAll().then(async (data)=>{
-                await setListOfContacts(data.sort((a, b)=>a.displayName.localeCompare(b.displayName)));
+                await setListOfContacts(data);
                 getFavoriteContact()
             }).catch(err=>{
                 //console.log(err)
@@ -35,22 +35,11 @@ const ContactList = ({navigation, ...props})=>{
         AsyncStorage.getItem("FAVORITE_CONTACT_RECORD_ID", (err, recordID)=>{
             if(err)return false;
             setFavoriteContactRecordID(recordID);
-            if(recordID == null){
-                setListOfContacts(listOfContacts.sort((a, b)=>a.displayName.localeCompare(b.displayName)));
-                return null;
-            }
-            let fav = listOfContacts.find(c=>c.recordID == recordID);
-            if(fav){
-                setListOfContacts([
-                    fav, ...listOfContacts.filter(c=>c.recordID != recordID)
-                    .sort((a, b)=>a.displayName.localeCompare(b.displayName))
-                ]);
-            }
         })
     }
 
     useEffect(()=>{
-        navigation.addListener("focus", ()=>{
+        const unsubscribe = navigation.addListener("focus", ()=>{
             if(navigation.isFocused()){
                 getFavoriteContact();
             }
@@ -70,13 +59,19 @@ const ContactList = ({navigation, ...props})=>{
         }else{
             fetchContacts()
         }
-    }, [navigation]);
+
+        return unsubscribe;
+    }, [1]);
 
     return(
         <SafeAreaView style={styles.wrapper}>
             <View style={styles.container}>
                 <FlatList
-                    data={listOfContacts}
+                    data={listOfContacts.sort((a, b)=>{
+                        if(a.recordID == favoriteContactRecordID)return -1;
+                        if(b.recordID == favoriteContactRecordID)return 1;
+                        return a.displayName.localeCompare(b.displayName)
+                    })}
                     renderItem={({item})=>{
                         if(item.recordID == favoriteContactRecordID){
                             return (
