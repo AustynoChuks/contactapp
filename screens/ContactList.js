@@ -73,6 +73,7 @@ const ContactList = ({navigation, ...props})=>{
                         return a.displayName.localeCompare(b.displayName)
                     })}
                     renderItem={({item})=>{
+                        const initials = ((item.givenName.length > 0)?item.givenName[0]:"") + ((item.familyName.length > 0)?item.familyName[0] :"");
                         if(item.recordID == favoriteContactRecordID){
                             return (
                                 <TouchableOpacity style={styles.contactBtn} onPress={()=>{
@@ -92,9 +93,18 @@ const ContactList = ({navigation, ...props})=>{
                         return (<TouchableOpacity style={styles.contactBtn} onPress={()=>{
                             navigation.navigate("contactdetails", {details:item});
                         }}>
-                            <View style={{minHeight:50, justifyContent:"center"}}>
-                                <Text style={styles.displayName}>{item.displayName}</Text>
-                                {(item.company != "")&&<Text style={styles.label}>{item.company}</Text>}
+                            <View style={{flex:1, flexDirection:"row"}}>
+                                <View style={styles.thumbnail}>
+                                    {
+                                        (item.hasThumbnail)?
+                                        <Image source={{uri:item.thumbnailPath}} style={styles.image}/>:
+                                        <Text style={styles.thumbnailText}>{initials}</Text>
+                                    }
+                                </View>
+                                <View style={{minHeight:50, justifyContent:"center", paddingHorizontal:20}}>
+                                    <Text style={styles.displayName}>{item.displayName}</Text>
+                                    {(item.company != "")&&<Text style={styles.label}>{item.company}</Text>}
+                                </View>
                             </View>
                         </TouchableOpacity>)
                     }}
@@ -125,12 +135,14 @@ const styles = StyleSheet.create({
     contactBtn:{
         paddingHorizontal:15,
         paddingVertical:10,
-        borderWidth:0.5,
-        borderColor:"#f1f1f1"
+        borderWidth:5,
+        borderColor:"#fcfcfc"
     },
     displayName:{
         fontSize:16,
-        //fontWeight:"bold"
+        color:"#000",
+        fontWeight:"lighter",
+        fontFamily:"helvetica"
     },
     image:{
         width:40,
@@ -139,6 +151,23 @@ const styles = StyleSheet.create({
     label:{
         fontSize:10,
         color:"#000"
-    }
+    },
+    thumbnail:{
+        width:50,
+        height:50,
+        backgroundColor:"orange",
+        borderRadius:100,
+        alignItems:"center",
+        justifyContent:"center"
+    },
+    image:{
+        width:40,
+        height:40
+    },
+    thumbnailText: {
+        color:"#fff",
+        fontSize:20,
+        fontWeight:"bold"
+    },
 });
 export default ContactList

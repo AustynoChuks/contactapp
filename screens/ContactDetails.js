@@ -109,8 +109,10 @@ const styles = StyleSheet.create({
     },
     displayName:{
         fontSize:16,
-        fontWeight:"bold",
-        marginTop:15
+        fontWeight:"lighter",
+        marginTop:15,
+        color:"#000",
+        fontFamily:"helvetica"
     },
     contactBtn:{
         paddingHorizontal:15,
